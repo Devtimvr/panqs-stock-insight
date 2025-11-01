@@ -3,13 +3,19 @@ import { ProductData, ProcessedProduct } from '@/types/inventory';
 
 export const fetchCSVFromURL = async (url: string): Promise<ProcessedProduct[]> => {
   return new Promise((resolve, reject) => {
-    Papa.parse<ProductData>(url, {
+    Papa.parse(url, {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         try {
-          const processed = results.data.map((row) => {
+          // Log primeira linha para ver as colunas disponíveis
+          if (results.data.length > 0) {
+            console.log('Colunas disponíveis:', Object.keys(results.data[0]));
+            console.log('Primeira linha de dados:', results.data[0]);
+          }
+
+          const processed = results.data.map((row: any) => {
             // Clean currency strings - more robust handling
             const cleanCurrency = (value: string | number | undefined) => {
               if (!value && value !== 0) return 0;
@@ -27,29 +33,33 @@ export const fetchCSVFromURL = async (url: string): Promise<ProcessedProduct[]> 
               return isNaN(num) ? 0 : num;
             };
 
-            const product = {
-              name: row["Nome do Produto"],
-              turnover: cleanNumber(row["Giro"]),
-              initialCount: cleanNumber(row["Contagem 1"]),
-              entry: cleanNumber(row["Entrada"]),
-              finalCount: cleanNumber(row["Contagem 2"]),
-              turnoverValue: cleanCurrency(row["Giro em Reais"]),
-              unitPrice: cleanCurrency(row[""]),
-            };
+            // Try different possible column names
+            const productName = row["Nome do Produto"] || row["Nome"] || row["Produto"] || row["nome"] || "";
+            const giro = row["Giro"] || row["giro"] || 0;
+            const contagem1 = row["Contagem 1"] || row["Contagem1"] || row["contagem1"] || 0;
+            const entrada = row["Entrada"] || row["entrada"] || 0;
+            const contagem2 = row["Contagem 2"] || row["Contagem2"] || row["contagem2"] || 0;
+            const giroReais = row["Giro em Reais"] || row["GiroReais"] || row["giroReais"] || 0;
+            
+            // For price, try empty string column or common price column names
+            const preco = row[""] || row["Preço"] || row["Preco"] || row["Preço Unitário"] || row["PrecoUnitario"] || row["preco"] || 0;
 
-            // Debug log
-            console.log('Produto processado:', {
-              nome: product.name,
-              finalCount: product.finalCount,
-              unitPrice: product.unitPrice,
-              valor: product.finalCount * product.unitPrice
-            });
+            const product = {
+              name: productName,
+              turnover: cleanNumber(giro),
+              initialCount: cleanNumber(contagem1),
+              entry: cleanNumber(entrada),
+              finalCount: cleanNumber(contagem2),
+              turnoverValue: cleanCurrency(giroReais),
+              unitPrice: cleanCurrency(preco),
+            };
 
             return product;
           }).filter(p => p.name && p.name.trim() !== ''); // Filter out empty rows
 
           console.log('Total de produtos processados:', processed.length);
-          console.log('Soma total:', processed.reduce((sum, p) => sum + (p.finalCount * p.unitPrice), 0));
+          console.log('Amostra de 3 produtos:', processed.slice(0, 3));
+          console.log('Soma total em estoque:', processed.reduce((sum, p) => sum + (p.finalCount * p.unitPrice), 0));
 
           resolve(processed);
         } catch (error) {
