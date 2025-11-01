@@ -10,29 +10,55 @@ export const fetchCSVFromURL = async (url: string): Promise<ProcessedProduct[]> 
       complete: (results) => {
         try {
           const processed = results.data.map((row) => {
-            // Clean currency strings
-            const cleanCurrency = (value: string) => {
-              if (!value) return 0;
-              return parseFloat(value.replace(/[R$\s.]/g, '').replace(',', '.'));
+            // Clean currency strings - more robust handling
+            const cleanCurrency = (value: string | number | undefined) => {
+              if (!value && value !== 0) return 0;
+              const stringValue = String(value);
+              // Remove R$, spaces, and dots (thousands separator)
+              // Replace comma with dot (decimal separator)
+              const cleaned = stringValue.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+              const parsed = parseFloat(cleaned);
+              return isNaN(parsed) ? 0 : parsed;
             };
 
-            return {
+            const cleanNumber = (value: string | number | undefined) => {
+              if (!value && value !== 0) return 0;
+              const num = Number(value);
+              return isNaN(num) ? 0 : num;
+            };
+
+            const product = {
               name: row["Nome do Produto"],
-              turnover: Number(row["Giro"]) || 0,
-              initialCount: Number(row["Contagem 1"]) || 0,
-              entry: Number(row["Entrada"]) || 0,
-              finalCount: Number(row["Contagem 2"]) || 0,
+              turnover: cleanNumber(row["Giro"]),
+              initialCount: cleanNumber(row["Contagem 1"]),
+              entry: cleanNumber(row["Entrada"]),
+              finalCount: cleanNumber(row["Contagem 2"]),
               turnoverValue: cleanCurrency(row["Giro em Reais"]),
               unitPrice: cleanCurrency(row[""]),
             };
-          }).filter(p => p.name); // Filter out empty rows
+
+            // Debug log
+            console.log('Produto processado:', {
+              nome: product.name,
+              finalCount: product.finalCount,
+              unitPrice: product.unitPrice,
+              valor: product.finalCount * product.unitPrice
+            });
+
+            return product;
+          }).filter(p => p.name && p.name.trim() !== ''); // Filter out empty rows
+
+          console.log('Total de produtos processados:', processed.length);
+          console.log('Soma total:', processed.reduce((sum, p) => sum + (p.finalCount * p.unitPrice), 0));
 
           resolve(processed);
         } catch (error) {
+          console.error('Erro ao processar CSV:', error);
           reject(error);
         }
       },
       error: (error) => {
+        console.error('Erro ao baixar CSV:', error);
         reject(error);
       },
     });
