@@ -8,12 +8,20 @@ import { ProcessedProduct } from "@/types/inventory";
 import { calculateMetrics } from "@/utils/csvParser";
 
 const Index = () => {
-  const [products, setProducts] = useState<ProcessedProduct[]>([]);
+  const [turnoverData, setTurnoverData] = useState<ProcessedProduct[]>([]);
+  const [balanceData, setBalanceData] = useState<any[]>([]);
+  const [cadastroCount, setCadastroCount] = useState<number>(0);
   const [hasData, setHasData] = useState(false);
   const [weeklyRevenue, setWeeklyRevenue] = useState<number>(0);
 
-  const handleDataLoaded = (data: ProcessedProduct[]) => {
-    setProducts(data);
+  const handleDataLoaded = (
+    turnover: ProcessedProduct[], 
+    balance: any[], 
+    productCount: number
+  ) => {
+    setTurnoverData(turnover);
+    setBalanceData(balance);
+    setCadastroCount(productCount);
     setHasData(true);
   };
 
@@ -21,7 +29,7 @@ const Index = () => {
     setWeeklyRevenue(revenue);
   };
 
-  const metrics = hasData ? calculateMetrics(products, weeklyRevenue) : null;
+  const metrics = hasData ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue) : null;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -89,7 +97,7 @@ const Index = () => {
             </div>
 
             {/* Product Table */}
-            <ProductTable products={products} />
+            <ProductTable products={turnoverData} />
           </>
         )}
 

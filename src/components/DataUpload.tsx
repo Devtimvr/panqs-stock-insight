@@ -4,15 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RefreshCw, TrendingUp } from "lucide-react";
-import { fetchCSVFromURL } from "@/utils/csvParser";
+import { fetchCSVFromURL, fetchBalanceData, fetchCadastroData } from "@/utils/csvParser";
 import { ProcessedProduct } from "@/types/inventory";
 import { toast } from "sonner";
 
-const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?output=csv";
+const BALANCE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?gid=1233627160&single=true&output=csv";
+const CADASTRO_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?gid=1339087143&single=true&output=csv";
+const TURNOVER_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?output=csv";
 const REFRESH_INTERVAL = 30000; // 30 seconds
 
 interface DataUploadProps {
-  onDataLoaded: (data: ProcessedProduct[]) => void;
+  onDataLoaded: (turnoverData: ProcessedProduct[], balanceData: any[], cadastroCount: number) => void;
   onRevenueChange: (revenue: number) => void;
   weeklyRevenue: number;
 }
@@ -24,11 +26,18 @@ const DataUpload = ({ onDataLoaded, onRevenueChange, weeklyRevenue }: DataUpload
   const fetchData = async (showToast = true) => {
     setLoading(true);
     try {
-      const data = await fetchCSVFromURL(GOOGLE_SHEETS_URL);
-      onDataLoaded(data);
+      // Buscar dados das três fontes em paralelo
+      const [turnoverData, balanceData, cadastroProducts] = await Promise.all([
+        fetchCSVFromURL(TURNOVER_URL),
+        fetchBalanceData(BALANCE_URL),
+        fetchCadastroData(CADASTRO_URL)
+      ]);
+      
+      onDataLoaded(turnoverData, balanceData, cadastroProducts.length);
       setLastUpdate(new Date());
+      
       if (showToast) {
-        toast.success(`${data.length} produtos carregados com sucesso!`);
+        toast.success(`Dados atualizados! ${cadastroProducts.length} produtos cadastrados.`);
       }
     } catch (error) {
       if (showToast) {
