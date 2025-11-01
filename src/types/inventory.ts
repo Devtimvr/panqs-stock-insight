@@ -23,7 +23,8 @@ export interface ProcessedProduct {
 export interface InventoryMetrics {
   totalValue: number;
   productCount: number;
-  cmvReal: number;
+  cmvRealPercentage: number | null;
+  totalTurnoverValue: number;
   productsWithoutPrice: number;
   turnoverTrend: 'up' | 'down' | 'stable';
 }

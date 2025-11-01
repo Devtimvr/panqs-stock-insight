@@ -1,9 +1,10 @@
 import Papa from 'papaparse';
 import { ProductData, ProcessedProduct } from '@/types/inventory';
 
-export const parseCSV = (file: File): Promise<ProcessedProduct[]> => {
+export const fetchCSVFromURL = async (url: string): Promise<ProcessedProduct[]> => {
   return new Promise((resolve, reject) => {
-    Papa.parse<ProductData>(file, {
+    Papa.parse<ProductData>(url, {
+      download: true,
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
@@ -11,15 +12,16 @@ export const parseCSV = (file: File): Promise<ProcessedProduct[]> => {
           const processed = results.data.map((row) => {
             // Clean currency strings
             const cleanCurrency = (value: string) => {
+              if (!value) return 0;
               return parseFloat(value.replace(/[R$\s.]/g, '').replace(',', '.'));
             };
 
             return {
               name: row["Nome do Produto"],
-              turnover: Number(row["Giro"]),
-              initialCount: Number(row["Contagem 1"]),
-              entry: Number(row["Entrada"]),
-              finalCount: Number(row["Contagem 2"]),
+              turnover: Number(row["Giro"]) || 0,
+              initialCount: Number(row["Contagem 1"]) || 0,
+              entry: Number(row["Entrada"]) || 0,
+              finalCount: Number(row["Contagem 2"]) || 0,
               turnoverValue: cleanCurrency(row["Giro em Reais"]),
               unitPrice: cleanCurrency(row[""]),
             };
@@ -37,23 +39,25 @@ export const parseCSV = (file: File): Promise<ProcessedProduct[]> => {
   });
 };
 
-export const calculateMetrics = (products: ProcessedProduct[]) => {
+export const calculateMetrics = (products: ProcessedProduct[], weeklyRevenue?: number) => {
   const totalValue = products.reduce((sum, p) => sum + (p.finalCount * p.unitPrice), 0);
   const productCount = products.length;
   const totalTurnoverValue = products.reduce((sum, p) => sum + p.turnoverValue, 0);
-  const totalCost = products.reduce((sum, p) => sum + (p.turnover * p.unitPrice), 0);
   
-  // CMV Real = Total cost of goods sold
-  const cmvReal = totalCost;
+  // CMV Real (%) = (Giro em Reais / Faturamento Semanal) * 100
+  let cmvRealPercentage = null;
+  if (weeklyRevenue && weeklyRevenue > 0) {
+    cmvRealPercentage = (totalTurnoverValue / weeklyRevenue) * 100;
+  }
   
   const productsWithoutPrice = products.filter(p => !p.unitPrice || p.unitPrice === 0).length;
 
   return {
     totalValue,
     productCount,
-    cmvReal,
+    cmvRealPercentage,
+    totalTurnoverValue,
     productsWithoutPrice,
     turnoverTrend: 'stable' as const,
-    totalTurnoverValue,
   };
 };

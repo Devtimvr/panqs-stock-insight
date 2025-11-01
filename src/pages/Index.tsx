@@ -10,13 +10,18 @@ import { calculateMetrics } from "@/utils/csvParser";
 const Index = () => {
   const [products, setProducts] = useState<ProcessedProduct[]>([]);
   const [hasData, setHasData] = useState(false);
+  const [weeklyRevenue, setWeeklyRevenue] = useState<number>(0);
 
   const handleDataLoaded = (data: ProcessedProduct[]) => {
     setProducts(data);
     setHasData(true);
   };
 
-  const metrics = hasData ? calculateMetrics(products) : null;
+  const handleRevenueChange = (revenue: number) => {
+    setWeeklyRevenue(revenue);
+  };
+
+  const metrics = hasData ? calculateMetrics(products, weeklyRevenue) : null;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -30,7 +35,11 @@ const Index = () => {
       <div className="max-w-7xl mx-auto">
         <DashboardHeader userName="RAFAEL" />
         
-        <DataUpload onDataLoaded={handleDataLoaded} />
+        <DataUpload 
+          onDataLoaded={handleDataLoaded}
+          onRevenueChange={handleRevenueChange}
+          weeklyRevenue={weeklyRevenue}
+        />
 
         {hasData && metrics && (
           <>
@@ -52,10 +61,22 @@ const Index = () => {
               />
               <MetricCard
                 title="CMV Real"
-                value={formatCurrency(metrics.cmvReal)}
-                subtitle="Custo da mercadoria vendida"
+                value={
+                  metrics.cmvRealPercentage !== null 
+                    ? `${metrics.cmvRealPercentage.toFixed(2)}%`
+                    : 'Insira faturamento'
+                }
+                subtitle="Giro / Faturamento semanal"
                 icon={DollarSign}
-                trend={metrics.turnoverTrend}
+                trend={
+                  metrics.cmvRealPercentage !== null 
+                    ? metrics.cmvRealPercentage > 40 
+                      ? 'up' 
+                      : metrics.cmvRealPercentage < 30 
+                        ? 'down' 
+                        : 'stable'
+                    : undefined
+                }
                 iconBg="bg-accent/20"
               />
               <MetricCard
