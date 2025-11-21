@@ -23,7 +23,5 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-import EntradasSemana from "./components/EntradasSemana";
-
 
 export default App;

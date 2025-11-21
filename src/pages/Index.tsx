@@ -4,7 +4,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DataUpload from "@/components/DataUpload";
 import MetricCard from "@/components/MetricCard";
 import ProductTable from "@/components/ProductTable";
-import EntradasSemana from "@/components/EntradasSemana"; // <-- ADICIONADO
+import EntradasSemana from "@/components/Apin8n"; // <-- ADICIONADO
 import { ProcessedProduct } from "@/types/inventory";
 import { calculateMetrics } from "@/utils/csvParser";
 
@@ -44,6 +44,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
+        
         <DashboardHeader userName="RAFAEL" />
 
         <DataUpload

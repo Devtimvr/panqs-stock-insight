@@ -22,8 +22,8 @@ type WebhookResponse = {
   produtos_objetosGETALL: ProdutoGET[];
 };
 
-const API_URL =
-  "https://planilhastut-n8n.mikf4p.easypanel.host/webhook/6fcfa131-11f0-4dc2-9ff3-d62a09e1a9d1";
+// ATUALIZAR PLANILHA 
+const API_URL = "https://planilhastut-n8n.mikf4p.easypanel.host/webhook/6fcfa131-11f0-4dc2-9ff3-d62a09e1a9d1";
 
 export default function EntradasSemana() {
   const { data, isLoading, isError } = useQuery<WebhookResponse>({

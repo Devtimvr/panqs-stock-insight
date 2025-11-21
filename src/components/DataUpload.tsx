@@ -66,67 +66,8 @@ const DataUpload = ({ onDataLoaded, onRevenueChange, weeklyRevenue }: DataUpload
     return () => clearInterval(interval);
   }, []);
 
-  return (
-
-    // CARD MAIS CANSADO DO MUNDO - DESNECESSARIO
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Dados em Tempo Real
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fetchData(true)}
-            disabled={loading}
-            className="gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            Atualizar
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              Fonte: Google Sheets
-            </span>
-            {lastUpdate && (
-              <span className="text-muted-foreground">
-                Última atualização: {lastUpdate.toLocaleTimeString('pt-BR')}
-              </span>
-            )}
-          </div>
-          
-          <div className="pt-4 border-t">
-            <Label htmlFor="weekly-revenue" className="text-sm font-medium">
-              Faturamento Total da Semana (R$)
-            </Label>
-            <Input
-              id="weekly-revenue"
-              type="number"
-              step="0.01"
-              min="0"
-              value={weeklyRevenue || ''}
-              onChange={(e) => onRevenueChange(parseFloat(e.target.value) || 0)}
-              placeholder="Ex: 15000.00"
-              className="mt-2"
-            />
-            <p className="text-xs text-muted-foreground mt-2">
-              Necessário para calcular o CMV Real em porcentagem
-            </p>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            Os dados são atualizados automaticamente a cada 30 segundos
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  return null;
+  
 };
 
 export default DataUpload;
