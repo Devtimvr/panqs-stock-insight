@@ -9,6 +9,7 @@ interface ProductTableProps {
   products: ProcessedProduct[];
 }
 
+
 const ProductTable = ({ products }: ProductTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
 

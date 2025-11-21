@@ -8,8 +8,13 @@ import { fetchCSVFromURL, fetchBalanceData, fetchCadastroData } from "@/utils/cs
 import { ProcessedProduct } from "@/types/inventory";
 import { toast } from "sonner";
 
+// PLANILHA DO SHEETS PARA SIMULAR O ESTOQUE REAL
 const BALANCE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?gid=1233627160&single=true&output=csv";
+
+//// PLANILHA DO SHEETS PARA SIMULAR O ESTOQUE REAL
 const CADASTRO_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?gid=1339087143&single=true&output=csv";
+
+
 const TURNOVER_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-0NIA1GWsBNW6co9OYnDYBkUYbgJtBxSa0fyPVLmQE7RPEhMVXf2-8lFeaCndUhP9GzQxW8ynVMii/pub?output=csv";
 const REFRESH_INTERVAL = 30000; // 30 seconds
 
@@ -62,6 +67,8 @@ const DataUpload = ({ onDataLoaded, onRevenueChange, weeklyRevenue }: DataUpload
   }, []);
 
   return (
+
+    // CARD MAIS CANSADO DO MUNDO - DESNECESSARIO
     <Card className="mb-8">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">

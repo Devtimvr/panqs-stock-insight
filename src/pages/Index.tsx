@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Package, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
+import { Package, DollarSign, AlertTriangle } from "lucide-react";
 import DashboardHeader from "@/components/DashboardHeader";
 import DataUpload from "@/components/DataUpload";
 import MetricCard from "@/components/MetricCard";
 import ProductTable from "@/components/ProductTable";
+import EntradasSemana from "@/components/EntradasSemana"; // <-- ADICIONADO
 import { ProcessedProduct } from "@/types/inventory";
 import { calculateMetrics } from "@/utils/csvParser";
 
@@ -15,8 +16,8 @@ const Index = () => {
   const [weeklyRevenue, setWeeklyRevenue] = useState<number>(0);
 
   const handleDataLoaded = (
-    turnover: ProcessedProduct[], 
-    balance: any[], 
+    turnover: ProcessedProduct[],
+    balance: any[],
     productCount: number
   ) => {
     setTurnoverData(turnover);
@@ -29,12 +30,14 @@ const Index = () => {
     setWeeklyRevenue(revenue);
   };
 
-  const metrics = hasData ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue) : null;
+  const metrics = hasData
+    ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue)
+    : null;
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
@@ -42,8 +45,8 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <DashboardHeader userName="RAFAEL" />
-        
-        <DataUpload 
+
+        <DataUpload
           onDataLoaded={handleDataLoaded}
           onRevenueChange={handleRevenueChange}
           weeklyRevenue={weeklyRevenue}
@@ -70,19 +73,19 @@ const Index = () => {
               <MetricCard
                 title="CMV Real"
                 value={
-                  metrics.cmvRealPercentage !== null 
+                  metrics.cmvRealPercentage !== null
                     ? `${metrics.cmvRealPercentage.toFixed(2)}%`
-                    : 'Insira faturamento'
+                    : "Insira faturamento"
                 }
                 subtitle="Giro / Faturamento semanal"
                 icon={DollarSign}
                 trend={
-                  metrics.cmvRealPercentage !== null 
-                    ? metrics.cmvRealPercentage > 40 
-                      ? 'up' 
-                      : metrics.cmvRealPercentage < 30 
-                        ? 'down' 
-                        : 'stable'
+                  metrics.cmvRealPercentage !== null
+                    ? metrics.cmvRealPercentage > 40
+                      ? "up"
+                      : metrics.cmvRealPercentage < 30
+                      ? "down"
+                      : "stable"
                     : undefined
                 }
                 iconBg="bg-accent/20"
@@ -98,6 +101,10 @@ const Index = () => {
 
             {/* Product Table */}
             <ProductTable products={turnoverData} />
+
+            {/* ENTRADAS DA SEMANA (WEBHOOK) */}
+            <EntradasSemana />  {/* <-- COMPONENTE ADICIONADO AQUI */}
+
           </>
         )}
 
