@@ -45,17 +45,18 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         
+        {/* SAUDAÇÕES */}
         <DashboardHeader userName="RAFAEL" />
-
         <DataUpload
           onDataLoaded={handleDataLoaded}
           onRevenueChange={handleRevenueChange}
           weeklyRevenue={weeklyRevenue}
         />
 
+
         {hasData && metrics && (
           <>
-            {/* Key Metrics */}
+            {/* GIB NUMBERS */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <MetricCard
                 title="Valor em Estoque"

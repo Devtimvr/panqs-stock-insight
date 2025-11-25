@@ -86,6 +86,27 @@ export const fetchCadastroData = async (url: string): Promise<string[]> => {
   });
 };
 
+// CADASTRO TOTAL
+// cadastroService.ts
+export const fetchCadastroprodutos = (url: string): Promise<number> => {
+  return new Promise(async (resolve) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Erro ao buscar cadastro");
+
+      const text = await res.text();
+      const total = Number(text);
+      if (isNaN(total)) throw new Error("Resposta do webhook não é um número");
+
+      resolve(total); // retorna o número
+    } catch (err) {
+      console.error("Erro ao buscar dados de cadastro:", err);
+      resolve(0); // fallback em caso de erro
+    }
+  });
+};
+
+
 export const fetchCSVFromURL = async (url: string): Promise<ProcessedProduct[]> => {
   return new Promise((resolve, reject) => {
     Papa.parse(url, {

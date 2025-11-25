@@ -1,28 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ProcessedProduct } from "@/types/inventory";
 import { Search, Package } from "lucide-react";
 
-interface ProductTableProps {
-  products: ProcessedProduct[];
+interface ProcessedProduct {
+  name: string;
+  turnover: number;
+  initialCount: number;
+  entry: number;
+  finalCount: number;
+  turnoverValue: number;
+  unitPrice: number;
+  semana: number;   // novo campo
 }
 
-
-const ProductTable = ({ products }: ProductTableProps) => {
+const ProductTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState<ProcessedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // 🔵 GET DO WEBHOOK DIRETO NO COMPONENTE
+  const fetchExcelData = async () => {
+    try {
+      const res = await fetch(
+        "https://planilhastut-n8n.mikf4p.easypanel.host/webhook/b1a8df9c-ac2d-41fe-91ec-8612b230183c"
+      );
+      const data = await res.json();
+
+      // 🔹 Como o seu webhook retorna um array direto
+      const formatted: ProcessedProduct[] = data.map((item: any) => ({
+        name: item.Produto || "",
+        turnover: item.giro_qtd || 0,
+        initialCount: item.contagem_inicial || 0,
+        entry: item["entradas_qtd (D2)"] || 0,
+        finalCount: item.contagem_final || 0,
+        turnoverValue: item["giro em reais"] || 0,
+        semana: item.Semana || 0,      // ADICIONANDO SEMANA
+        unitPrice: 0, // se não tiver preço real, coloque depois
+      }));
+
+      setProducts(formatted);
+      setLoading(false);
+    } catch (err) {
+      console.error("Erro ao buscar dados:", err);
+      setLoading(false);
+    }
+  };
+
+  // 🔵 CHAMADA AUTOMÁTICA DA API
+  useEffect(() => {
+    fetchExcelData();
+  }, []);
+
+  // 🔵 FILTRO
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
-  };
+
+  if (loading) {
+    return <div>Carregando produtos...</div>;
+  }
 
   return (
     <Card>
@@ -50,6 +94,7 @@ const ProductTable = ({ products }: ProductTableProps) => {
               <TableRow>
                 <TableHead>Produto</TableHead>
                 <TableHead className="text-right">Giro</TableHead>
+                <TableHead className="text-right">Semana</TableHead>
                 <TableHead className="text-right">Estoque Inicial</TableHead>
                 <TableHead className="text-right">Entrada</TableHead>
                 <TableHead className="text-right">Estoque Final</TableHead>
@@ -68,12 +113,13 @@ const ProductTable = ({ products }: ProductTableProps) => {
                 filteredProducts.map((product, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell className="text-right">{product.turnover}</TableCell>
-                    <TableCell className="text-right">{product.initialCount}</TableCell>
-                    <TableCell className="text-right">{product.entry}</TableCell>
-                    <TableCell className="text-right">{product.finalCount}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(product.turnoverValue)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(product.unitPrice)}</TableCell>
+                  <TableCell className="text-right">{product.turnover}</TableCell>
+                  <TableCell className="text-right">{product.semana}</TableCell>       
+                  <TableCell className="text-right">{product.initialCount}</TableCell>
+                  <TableCell className="text-right">{product.entry}</TableCell>
+                  <TableCell className="text-right">{product.finalCount}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(product.turnoverValue)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(product.unitPrice)}</TableCell>
                   </TableRow>
                 ))
               )}

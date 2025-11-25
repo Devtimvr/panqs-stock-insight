@@ -5,6 +5,7 @@ export interface ProductData {
   "Entrada": number;
   "Contagem 2": number;
   "Giro em Reais": string;
+  "semana":string;
   "": string; // Price column
 }
 
