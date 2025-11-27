@@ -163,7 +163,8 @@ export const calculateMetrics = (
   balanceProducts: BalanceProduct[], 
   cadastroCount: number,
   turnoverData: ProcessedProduct[], 
-  weeklyRevenue?: number
+  weeklyRevenue?: number,
+  maisum?: number
 ) => {
   // Valor em estoque vem do Balanço
   const totalValue = balanceProducts.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);

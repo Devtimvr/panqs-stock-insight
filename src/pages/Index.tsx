@@ -4,9 +4,11 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DataUpload from "@/components/DataUpload";
 import MetricCard from "@/components/MetricCard";
 import ProductTable from "@/components/ProductTable";
-import EntradasSemana from "@/components/Apin8n"; // <-- ADICIONADO
+import { Cmvfunction } from "@/components/Apin8n"; // <-- ADICIONADO
 import { ProcessedProduct } from "@/types/inventory";
 import { calculateMetrics } from "@/utils/csvParser";
+
+
 
 const Index = () => {
   const [turnoverData, setTurnoverData] = useState<ProcessedProduct[]>([]);
@@ -30,8 +32,13 @@ const Index = () => {
     setWeeklyRevenue(revenue);
   };
 
+  // webhook do cmv
+  const { data: cmvSemanal, isLoading: loadingCMV } = Cmvfunction();
+
+
+
   const metrics = hasData
-    ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue)
+    ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue, cmvSemanal)
     : null;
 
   const formatCurrency = (value: number) => {
@@ -40,6 +47,9 @@ const Index = () => {
       currency: "BRL",
     }).format(value);
   };
+
+  
+
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -52,7 +62,6 @@ const Index = () => {
           onRevenueChange={handleRevenueChange}
           weeklyRevenue={weeklyRevenue}
         />
-
 
         {hasData && metrics && (
           <>
@@ -72,40 +81,39 @@ const Index = () => {
                 icon={Package}
                 iconBg="bg-secondary/20"
               />
+
+              {/*     CMV          */}
               <MetricCard
-                title="CMV Real"
+                title="CMV Semanal"
                 value={
-                  metrics.cmvRealPercentage !== null
-                    ? `${metrics.cmvRealPercentage.toFixed(2)}%`
-                    : "Insira faturamento"
+                  loadingCMV
+                    ? "Carregando..."
+                    : cmvSemanal === undefined
+                    ? "Sem dados"
+                    : cmvSemanal === 0
+                    ? "Atualizar o Faturamento"
+                    : `${(cmvSemanal * 100).toFixed(2)}%`
                 }
-                subtitle="Giro / Faturamento semanal"
-                icon={DollarSign}
-                trend={
-                  metrics.cmvRealPercentage !== null
-                    ? metrics.cmvRealPercentage > 40
-                      ? "up"
-                      : metrics.cmvRealPercentage < 30
-                      ? "down"
-                      : "stable"
-                    : undefined
+                subtitle={
+                  loadingCMV
+                    ? "Carregando..."
+                    : cmvSemanal === undefined
+                    ? "Necessita atenção"
+                    : cmvSemanal === 0
+                    ? "Atualizar o Faturamento"
+                    : "CMV Atualizado"
                 }
-                iconBg="bg-accent/20"
-              />
-              <MetricCard
-                title="Produtos sem Preço"
-                value={metrics.productsWithoutPrice}
-                subtitle="Necessita atenção"
                 icon={AlertTriangle}
                 iconBg="bg-destructive/20"
               />
+
             </div>
 
             {/* Product Table */}
-            <ProductTable products={turnoverData} />
+            <ProductTable />
 
             {/* ENTRADAS DA SEMANA (WEBHOOK) */}
-            <EntradasSemana />  {/* <-- COMPONENTE ADICIONADO AQUI */}
+              {/* <EntradasSemana /><-- COMPONENTE ADICIONADO AQUI */}
 
           </>
         )}
