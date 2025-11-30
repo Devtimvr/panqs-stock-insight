@@ -99,7 +99,7 @@ const ProductTable = () => {
                 <TableHead className="text-right">Entrada</TableHead>
                 <TableHead className="text-right">Estoque Final</TableHead>
                 <TableHead className="text-right">Giro (R$)</TableHead>
-                <TableHead className="text-right">Preço Unit.</TableHead>
+                {/*<TableHead className="text-right">Preço Unit.</TableHead>*/}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -119,7 +119,7 @@ const ProductTable = () => {
                   <TableCell className="text-right">{product.entry}</TableCell>
                   <TableCell className="text-right">{product.finalCount}</TableCell>
                   <TableCell className="text-right">{formatCurrency(product.turnoverValue)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(product.unitPrice)}</TableCell>
+                  {/*<TableCell className="text-right">{formatCurrency(product.unitPrice)}</TableCell>*/}
                   </TableRow>
                 ))
               )}

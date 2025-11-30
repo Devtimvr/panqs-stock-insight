@@ -57,6 +57,7 @@ const Index = () => {
         
         {/* SAUDAÇÕES */}
         <DashboardHeader userName="RAFAEL" />
+
         <DataUpload
           onDataLoaded={handleDataLoaded}
           onRevenueChange={handleRevenueChange}
@@ -67,13 +68,19 @@ const Index = () => {
           <>
             {/* BiG NUMBERS */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
               <MetricCard
                 title="Valor em Estoque"
-                value={formatCurrency(metrics.fatSemanal)}
+                value= {
+                  loadingFat 
+                  ? "Carregando dados" 
+                  : formatCurrency(metrics.fatSemanal) 
+                }
                 subtitle="Total atual"
                 icon={Package}
                 iconBg="bg-accent/20"
               />
+
               <MetricCard
                 title="Produtos Cadastrados"
                 value={metrics.productCount}
