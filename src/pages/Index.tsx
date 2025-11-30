@@ -4,7 +4,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DataUpload from "@/components/DataUpload";
 import MetricCard from "@/components/MetricCard";
 import ProductTable from "@/components/ProductTable";
-import { Cmvfunction } from "@/components/Apin8n"; // <-- ADICIONADO
+import { Cmvfunction , ValEstoque } from "@/components/Apin8n"; // <-- ADICIONADO
 import { ProcessedProduct } from "@/types/inventory";
 import { calculateMetrics } from "@/utils/csvParser";
 
@@ -21,11 +21,13 @@ const Index = () => {
     turnover: ProcessedProduct[],
     balance: any[],
     productCount: number
+
   ) => {
     setTurnoverData(turnover);
     setBalanceData(balance);
     setCadastroCount(productCount);
     setHasData(true);
+    setWeeklyRevenue;
   };
 
   const handleRevenueChange = (revenue: number) => {
@@ -35,10 +37,11 @@ const Index = () => {
   // webhook do cmv
   const { data: cmvSemanal, isLoading: loadingCMV } = Cmvfunction();
 
-
+  //Webhook do faturamento
+  const { data: fatSemanal, isLoading: loadingFat } = ValEstoque();
 
   const metrics = hasData
-    ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue, cmvSemanal)
+    ? calculateMetrics(balanceData, cadastroCount, turnoverData, weeklyRevenue, cmvSemanal, fatSemanal)
     : null;
 
   const formatCurrency = (value: number) => {
@@ -47,9 +50,6 @@ const Index = () => {
       currency: "BRL",
     }).format(value);
   };
-
-  
-
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -65,11 +65,11 @@ const Index = () => {
 
         {hasData && metrics && (
           <>
-            {/* GIB NUMBERS */}
+            {/* BiG NUMBERS */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <MetricCard
                 title="Valor em Estoque"
-                value={formatCurrency(metrics.totalValue)}
+                value={formatCurrency(metrics.fatSemanal)}
                 subtitle="Total atual"
                 icon={Package}
                 iconBg="bg-accent/20"

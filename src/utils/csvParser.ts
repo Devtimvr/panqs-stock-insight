@@ -164,10 +164,11 @@ export const calculateMetrics = (
   cadastroCount: number,
   turnoverData: ProcessedProduct[], 
   weeklyRevenue?: number,
-  maisum?: number
+  maisum?: number,
+  maisdois?: number
 ) => {
-  // Valor em estoque vem do Balanço
-  const totalValue = balanceProducts.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
+  // Valor em estoque vem da API
+  const fatSemanal = maisdois;
   
   // Número de produtos cadastrados vem do Cadastro
   const productCount = cadastroCount;
@@ -185,7 +186,7 @@ export const calculateMetrics = (
   const productsWithoutPrice = balanceProducts.filter(p => !p.unitPrice || p.unitPrice === 0).length;
 
   console.log('Métricas calculadas:', {
-    totalValue,
+    fatSemanal,
     productCount,
     cmvRealPercentage,
     totalTurnoverValue,
@@ -193,7 +194,7 @@ export const calculateMetrics = (
   });
 
   return {
-    totalValue,
+    fatSemanal,
     productCount,
     cmvRealPercentage,
     totalTurnoverValue,
