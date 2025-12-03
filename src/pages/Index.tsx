@@ -76,7 +76,7 @@ const Index = () => {
                   ? "Carregando dados" 
                   : formatCurrency(metrics.fatSemanal) 
                 }
-                subtitle="Total atual"
+                subtitle="Última Contagem"
                 icon={Package}
                 iconBg="bg-accent/20"
               />
@@ -84,7 +84,7 @@ const Index = () => {
               <MetricCard
                 title="Produtos Cadastrados"
                 value={metrics.productCount}
-                subtitle="Total de itens"
+                subtitle="Total de Itens"
                 icon={Package}
                 iconBg="bg-secondary/20"
               />
@@ -108,7 +108,7 @@ const Index = () => {
                     ? "Necessita atenção"
                     : cmvSemanal === 0
                     ? "Atualizar o Faturamento"
-                    : "CMV Atualizado"
+                    : "CMV Semana Fechada"
                 }
                 icon={AlertTriangle}
                 iconBg="bg-destructive/20"
